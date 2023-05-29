@@ -10,7 +10,7 @@ create table `Order` (
 oID int auto_increment,
 cID int ,
 oDate datetime not null,
-oTotalPrice double not null,
+oTotalPrice double null,
 Primary key (oID),
 FOREIGN KEY (cID) REFERENCES customer(cID)
 );
