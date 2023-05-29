@@ -1,5 +1,4 @@
 create database quanlysinhvien;
-use quanlysinhvien;
 create table class (
 ClassID int auto_increment primary key not null,
 ClassName varchar(60) not null,
