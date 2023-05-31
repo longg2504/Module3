@@ -58,24 +58,49 @@ select gv.magv , hoten from giaovien gv join thamgiadt tgdt on gv.magv=tgdt.magv
 -- Câu A6: Cho những giáo viên có lương nhỏ nhất
 select   magv , hoten , luong from giaovien where luong = (select min(luong) from giaovien);
 -- Câu A7: Cho những giáo viên có lương cao hơn tất cả các giáo viên của bộ môn HTTT
-select magv , hoten , luong from giaovien where luong =(select max(luong) from giaovien) and mabm = 'HTTT';
+select magv , hoten , luong from giaovien where luong >(select max(luong) from giaovien) and mabm = 'HTTT';
 -- Câu A8: Cho biết bộ môn (MABM) có đông giáo viên nhất 
-select mabm  from giaovien group by mabm where count(magv) > max(select count(magv) from giaovien group by mabm); 
+select mabm, count(mabm) as 'So luong giao vien' from giaovien group by mabm limit 1;
 -- Câu A9: Cho biết họ tên những giáo viên mà không có một người thân nào. (Sử dụng ALL
 -- thay vì NOT IN)
+select * from giaovien gv where gv.magv != all(select nt.magv from nguoithan nt where nt.magv is not null);
 -- Câu A10: Cho biết họ tên những giáo viên có tham gia đề tài. (Sử dụng = ANY thay vì IN)
+select magv , hoten from giaovien gv where gv.magv = any(select tgdt.magv from thamgiadt tgdt where tgdt.magv is not null);	
 -- Câu A11: Cho biết các giáo viên có tham gia đề tài.
 -- Câu A12: Cho biết các giáo viên không có người thân
 -- Câu A14: Cho biết những giáo viên có lương lớn hơn lương trung bình của bộ môn mà giáo
 -- viên đó làm việc.
--- Câu A15: Cho biết những giáo viên có lương lớn nhất
+SELECT * 
+FROM giaovien gv
+where gv.LUONG > (select avg(gv1.LUONG) from giaovien gv1 where gv.MABM = gv1.MABM);
+
+-- cach 2:
+SELECT * 
+FROM giaovien gv join (
+	SELECT MABM, avg(LUONG) as ltb
+	FROM giaovien
+	group by MABM
+) as tb_luong on gv.MABM = tb_luong.MABM
+where gv.LUONG > tb_luong.ltb;
 -- Câu A16: Cho biết những đề tài mà giáo viên ‘001’ không tham gia.
+select madt , tendt from detai where madt not in (select madt from thamgiadt where MAGV = '001');
 -- Câu A17: Cho biết họ tên những giáo viên có vai trò quản lý về mặt chuyên môn với các giáo
 -- viên khác
+SELECT * 
+FROM giaovien gv
+where gv.MAGV IN (select GVQLCM from giaovien gv2 where GVQLCM is not null); 	
 -- Câu A18: Cho biết những giáo viên có lương lớn nhất.
--- Câu A19: Cho biết những bộ môn (MABM) có đông giáo viên nhấ
+select *  from giaovien gv1 where  gv1.luong =  (select max(gv2.luong) from giaovien gv2);
+-- Câu A19: Cho biết những bộ môn (MABM) có đông giáo viên 
+select gv1.mabm , count(gv1.mabm) as 'so luong giao vien' from giaovien gv1 group by gv1.mabm limit 1;
 -- Câu A20: Cho biết những tên bộ môn, họ tên của trưởng bộ môn và số lượng giáo viên của
 -- bộ môn có đông giáo viên nhất
+select bm.TENBM, gv2.HOTEN, count(gv1.MABM) as soluonggiaovienmax
+from bomon bm
+join giaovien gv2 on bm.TRUONGBM = gv2.MAGV
+join giaovien gv1 on bm.MABM = gv1.MABM
+group by gv1.MABM
+having soluonggiaovienmax = (SELECT MAX(count) FROM (SELECT COUNT(gv1.MABM) as count FROM giaovien gv1 GROUP BY gv1.MABM) as counts);
 -- Câu A21: Cho biết những giáo viên có lương lớn hơn mức lương trung bình của giáo viên bộ
 -- môn Hệ thống thông tin mà không trực thuộc bộ môn hệ thống thông tin
 -- Câu A22: Cho tên biết đề tài có đông giáo viên tham gia nhất
@@ -84,8 +109,15 @@ select mabm  from giaovien group by mabm where count(magv) > max(select count(ma
 -- Câu B2: Tìm các giáo viên không tham gia đề tài nào
 -- Câu B3: Tìm các giáo viên vừa tham gia đề tài vừa là trưởng bộ môn.
 -- Câu B4: Liệt kê những giáo viên có tham gia đề tài và những giáo viên là trưởng bộ môn.
+SELECT distinct giaovien.MAGV 
+FROM giaovien 
+cross join bomon, thamgiadt where giaovien.MAGV = bomon.TRUONGBM or giaovien.MAGV = thamgiadt.MAGV
+ORDER BY giaovien.MAGV;
 -- Câu B5: Tìm các giáo viên (MAGV) mà tham gia tất cả các đề tài
 -- Câu B6: Tìm các giáo viên (MAGV) mà tham gia tất cả các đề tài (Dùng NOT EXISTS)
+select gv.magv from giaovien gv
+where not exists (select tgdt.magv from thamgiadt tgdt where gv.magv not in (select thamgiadt.MAGV from thamgiadt))
+order by gv.magv;
 -- Câu B7: Tìm các giáo viên (MAGV) mà tham gia tất cả các đề tài (Dùng NOT EXISTS)
 -- Câu B9: Tìm tên các giáo viên ‘HTTT’ mà tham gia tất cả các đề tài thuộc chủ đề ‘QLGD
 
