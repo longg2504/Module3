@@ -1,0 +1,57 @@
+body{
+    font-family: Arial;
+}
+
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.memu-horizontal{
+    width: 100%;
+    display: flex;
+    background-color: black;
+    list-style-type: none;
+}
+
+.menu-item{
+    margin: 0 10px;
+    cursor: pointer;
+    padding: 10px 30px;
+    position: relative;
+
+}
+
+.menu-item:hover {
+    background-color: red;
+}
+
+.menu-item a {
+    text-decoration: none;
+    color: azure;
+
+}
+
+.sub-menu{
+    position: absolute;
+    top: 38px;
+    left: 0;
+    visibility: hidden;
+    background-color: black;
+    list-style-type: none;
+}
+
+.sub-menu-item{
+    padding: 10px;
+    width: 200px;
+}
+
+.sub-menu-item:hover{
+    background-color: red;
+}
+
+
+.menu-item:hover .sub-menu{
+    visibility: visible;
+}
