@@ -175,7 +175,7 @@ public class CustomerServlet extends HttpServlet {
         if (customer == null) {
             dispatcher = request.getRequestDispatcher("error-404.jsp");
         } else {
-            this.customerService.remove(id);
+
             try {
                 response.sendRedirect("/customers");
             } catch (IOException e) {
