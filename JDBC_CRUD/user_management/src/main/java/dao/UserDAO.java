@@ -125,6 +125,45 @@ public class UserDAO implements IUserDAO{
         }
         return rowUpdated;
     }
+
+    @Override
+    public User getUserById(int id) throws SQLException {
+        User user = null;
+        String query = "{call get_user_by_id(?)}";
+        // Step 1: Establishing a Connection
+        Connection connection = getConnection();
+
+        // Step 2:Create a statement using connection object
+        CallableStatement callableStatement = connection.prepareCall(query);
+        callableStatement.setInt(1,id);
+
+        // Step 3: Execute the query or update query
+        ResultSet rs = callableStatement.executeQuery();
+
+        // Step 4: Process the ResultSet object.
+        while (rs.next()){
+            String name = rs.getString("name");
+            String email= rs.getString("email");
+            String country = rs.getString("country");
+            user = new User(id,name,email,country);
+
+        }
+        return user;
+    }
+
+    @Override
+    public void insertUserStore(User user) throws SQLException {
+        String query = "{call insert_user(?,?,?)}";
+
+        Connection connection = getConnection();
+        CallableStatement callableStatement = connection.prepareCall(query);
+        callableStatement.setString(1,user.getName());
+        callableStatement.setString(2,user.getEmail());
+        callableStatement.setString(3,user.getCountry());
+        System.out.println(callableStatement);
+        callableStatement.executeUpdate();
+    }
+
     private void printSQLException(SQLException ex) {
         for (Throwable e : ex) {
             if (e instanceof SQLException) {
